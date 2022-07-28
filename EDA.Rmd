@@ -1,0 +1,169 @@
+---
+title: "Does Taylor Swift release shorter songs now because shorter songs are more popular?"
+author: "Arisha Khan"
+date: "3/16/2022"
+output: pdf_document
+---
+**Abstract**
+
+In this study, we planned to analyze if the notion of declining attention spans has made its way into the music industry and its listeners. We checked a) if Taylor Swift’s songs have gotten shorter over the years and b) if her shorter songs are more popular among her streamers. We did not find any strong evidence for either. We conducted an ANOVA F-test and a pairwise difference test and found that average song length increased, decreased and then increased again over the years 2006-2021. We could not find a consistent decreasing pattern, and could not conclude that Taylor Swift’s songs have gotten shorter over the years. Additionally, with the help of linear regression analysis, we found evidence that her shorter songs are more popular among her streamers. This was, however, a weak negative correlation. We concluded that while there was an association between song length and popularity, it was a weak association. Hence, there is a low probability that a song is streamed more if it is shorter. However, it could happen. 
+
+**Introduction**
+
+
+Experts say that songs are getting shorter and will continue to get shorter because of declining attention spans.$^{1}$  Attention spans have dropped from 12 seconds to eight since 2000.$^{2}$ Specifically, in the music industry, this is translated to skipping track features on streaming platforms such as Spotify, Apple Music, and Youtube Music. For artists, it is important to draw in the listener's attention early in the song. According to research last year by the UK record label Ostereo, the length of the average number one song has shrunk by almost a fifth over the past two decades.$^{3}$ Consequently, if the song doesn’t grab the listener’s attention in the first half of the song, it will most likely lose additional streams. 
+
+**Data**
+
+In this report, we analyzed a dataset of Taylor Swift’s songs from Kaggle, which contains data gathered from songs on Taylor Swift’s albums. We analyzed if her songs have gotten shorter over the years and if a shorter song length is more popular among her Spotify listeners. We used 3 variables to do this observational study: release_year (release year of each song), length_min (song length in minutes), and popularity (percent popularity of the song based on Spotify’s algorithm, possibly the number of streams at a certain period of time). For our first relationship (determining the length over the years), the release year is the predictor variable while the length is the response variable, and our population concerns all Taylor Swift songs released over the years 2006-2021. For our second relationship (determining the popularity based on length), the variable length is the explanatory variable and the popularity is the response variable. Except for the variable for release year, which is categorical, our other two variables are quantitative. While we are only looking at Spotify data, our data analysis concerns the population that is listeners of Taylor Swift’s music across all streaming platforms. Since a streaming platform is chosen by a streamer due to personal choice and prices/availability, and the song/artist does not possibly play a role, we are assuming that the Spotify data can be used to generalize to every Taylor Swift streamer using a platform similar to Spotify. 
+
+**Note:** we assumed that her re-recorded albums are *old* albums; that is to say that we considered their original release year instead of the year the re-recordings were released. However, the new songs on these albums – named "From the Vault" – were categorized as new. Also, there are three songs in the dataset that have 0 popularity. Since there is no popularity information available for them, we excluded them when doing an analysis for our second relationship.
+
+**Results**
+
+```{r, include = FALSE}
+library(readr)
+library(dplyr)
+library(ggplot2)
+taylorSwift  <- read_csv("Spotify_taylorSwift - spotify_taylorswift 3.csv")
+taylorSwift$release_year<- factor(taylorSwift$release_year)
+```
+
+**For our first relationship, we would like to determine if Taylor Swift's songs have gotten shorter over the years. Are newer songs shorter on average? **
+
+By calculating the mean song length for each year the songs were released, we see that the mean song length for each year does not really follow a singular pattern. The average song length in 2006 is 3.6 minutes, after which it follows an increasing pattern with a mean length of 4.2 minutes in 2008 and 4.6 minutes in 2010. Then, the songs start decreasing in length with a mean length of 4.1 minutes in 2012 and 3.6 minutes in 2014. However, there's a 0.1 minute increase as the mean length is 3.7 minutes in 2017. Once again, this decreases with the mean length being 3.4 minutes in 2019. Recently, the songs have gotten longer again with a mean length of 3.9 minutes in 2020 and 4.0 minutes in 2021. The album *Speak Now (Deluxe Package)*, released in 2010, has the highest average song length and the album, *Lover*, released in 2019, has the shortest average song length. 
+
+```{r, include = FALSE}
+tapply(taylorSwift$length_min, taylorSwift$release_year, mean)
+```
+
+By making side-by-side boxplots for each release year, we again conclude that there does not exist a single pattern for average song length during years 2006-2021.
+
+**Graph#1:**
+
+```{r fig2, fig.width = 8,fig.asp = .5, echo=FALSE}
+ggplot(taylorSwift, aes(x = release_year, y = length_min)) + geom_boxplot() + labs(x = "Release year (of TS songs)" , y = "Song length (in minutes)")
+```
+
+The mean song length increases from year 2006-2010 (the boxplots go higher). However, after that, we can see a decreasing average song length from 2010-2019 with one marginal increase in between from 2014-2017. Afterwards, the song length increases for songs released in the years 2020 and 20201. Considering the numerical and graphical summaries, for now, we can not conclude that Taylor Swift’s songs have gotten shorter over the years since we did not find one trend for average song length. 
+
+To check if there’s a variance of means, we used an ANOVA F test to calculate a p-value to see if there is evidence in favor of the alternative hypothesis (that not all group means are equal). Our null hypothesis is that all group means are equal. 
+
+By simulating a lineup of fake datasets with same standard deviation, we found that our original dataset is not distinguishable from fake datasets. Hence we can continue with our assumption for F-test that our within group standard deviations are equal and conclude that the p-value for our F test result should be valid. See *appendix* for more. 
+
+After conducting the F-test, we found a p-value of 2.2e-08. Since the p-value is approximately zero, which is less than our significance level of 5%, we reject the null hypothesis in favor of the alternative hypothesis. We can therefore conclude that not all release years have the same mean song length. 
+
+```{r, include = FALSE}
+ts.aov<- aov(length_min ~ release_year, data = taylorSwift)
+summary(ts.aov)
+```
+
+By doing further analysis and a pairwise comparison of years 2006 and 2021, the years of first song release and the latest song release, we conclude that we are 95% confident that songs released in the year 2006 were on average song somewhere between 0.15 mins and 0.77 mins shorter than the songs released in the year 2021.
+
+```{r, include = FALSE}
+t.test(length_min ~ release_year, data = taylorSwift,
+subset = (release_year == "2006" | release_year == "2021"))
+```
+
+Considering these analyses, we can conclude that song length has definitely changed over the years, and songs released in 2006 were, on average, shorter than songs released in 2021.
+
+**For our second relationship, we would like to determine if there is a linear relationship between song length and popularity i.e (if a longer song is more unpopular and if a shorter song is more popular among Taylor Swift’s streamers).  **
+
+We constructed a scatterplot to check the correlation with the least squares line, and we found a weak negative linear relationship. 
+
+**Graph#2:**
+
+```{r fig3, fig.width = 8,fig.asp = .5, echo=FALSE}
+
+taylorSwift<- filter(taylorSwift, popularity!= 0)
+# there are three songs in datatset that have 0 popularity, there is no info available. So we are excluding these 3 values.
+
+ts.lm<- lm(popularity~length_min, data = taylorSwift)
+plot(popularity~length_min, data = taylorSwift, xlab = "Song length (in minutes)", ylab = " Popularity (percenet popularity)")
+abline(ts.lm)
+```
+
+Since the least squares line slopes downward, we can conclude that there's a negative relationship. However, the dots are spaced out which indicates a weak relationship. 
+
+If we calculate the correlation, we get *r = -0.3* and since this number is negative and small we can again confirm that it is a negative weak linear relationship. Our equation for the line turns out to be $\hat{Popularity}= 76.6 - 3.6*Length$. For every one minute increase in song length, the expected popularity of the song falls by 3.6 percent.
+
+```{r, include = FALSE}
+cor(taylorSwift$length_min, taylorSwift$popularity)
+ts.lm
+```
+
+Considering the numerical and graphical summaries, we can conclude that as the length increases, the popularity decreases. However, it is a weak relationship.
+
+```{r, include = FALSE}
+summary(ts.lm)
+```
+
+To see the difference in popularity for shorter songs vs longer songs, we calculate a confidence interval. We conclude that we are 95% confident that the mean popularity of the song decreases by between 1.6 and 5.6 percentage points for every one minute increase in the song length (with a standard error of 1.0).
+
+```{r, include = FALSE}
+critval<- qt(0.975, df=166)
+SE<-1.010
+
+-3.594 - (critval*SE)
+-3.594 + (critval*SE)
+```
+
+Considering this analysis, we can conclude that there is a correlation between song length and its popularity and that on average, popularity decreases if the song length increases.
+
+**Discussion**
+
+We found evidence that Taylor Swift's songs have varied in length over the years on average. From 2006-2010, songs show an increase in duration but then mostly become shorter from 2012-2019. However, her songs start getting longer again after 2019. In relation to our question of whether songs have gotten shorter over the years, we did not find evidence to support the claim and concluded that there does not exist a consistent downward trend to support our initial assumption. Additionally, we found evidence that shorter songs are more popular among Taylor Swift's streamers as we obtained a negative linear association. However, we did not find any strong evidence since the correlation was weak. There are low chances that a song's popuarity will increase as the length decreases.
+
+One of the limitations we faced while doing analysis for this study was grouping Taylor Swift's re-recordings and the songs 'from the vault'. We assigned these songs as *new* but these songs were written around the time of the original release of the album. Although fans speculate that these new songs might have been tweaked in one way or another to fit the re-release (considering her new and improved songwriting capabilities).$^5$ Since we don't know the degree of modification, it was confusing to categorize them as new or old. However considering there was speculation of some *modification* and some even featured current country artists  – "That's When" (featuring Keith Urban) and "You All Over Me" (featuring Maren Morris, – we categorized all of the vault songs as new.
+
+Additionally, there are a couple of potential future analyses we could do. Taylor Swift has changed genres a few times during her career. We see a change in the pattern of average song length when Taylor Swift changes genres. After 2010 (with her first few albums being mostly country), she was primarily a pop singer and her recent albums released in 2020 are more alternative/indie. We also see a decreasing trend after year 2010 and increasing trend starting with year 2020. Evermore and Folklore released in 2020 had the first mean song length increase after the downward trend and are usually categorized as indie, alternative pop or indie-folk.$^6$ Songs from these genres are generally known to be longer than pop songs which could explain the increased mean song length for year 2020.$^7$ A future analysis we could do is check if the album genres have any correlation/association with the song length.  
+
+**References**
+
+**1**
+
+Kopf, Dan. “The Economics of Streaming Is Making Songs Shorter.” Quartz. Quartz, January 24, 2020. https://qz.com/1519823/is-spotify-making-songs-shorter/.  
+
+Chadwick, Jonathan. “Pop Songs Will Get Shorter This Decade Because of Faltering Attention Spans.” Daily Mail Online. Associated Newspapers, December 24, 2020. https://www.dailymail.co.uk/sciencetech/article-9085211/Pop-songs-shorter-decade-faltering-attention-spans.html. 
+
+**2**
+
+McSpadden, Kevin. “Science: You Now Have a Shorter Attention Span than a Goldfish.” Time. Time, May 14, 2015. https://time.com/3858309/attention-spans-goldfish/. 
+
+**3**
+
+Chadwick, Jonathan. “Pop Songs Will Get Shorter This Decade Because of Faltering Attention Spans.” Daily Mail Online. Associated Newspapers, December 24, 2020. https://www.dailymail.co.uk/sciencetech/article-9085211/Pop-songs-shorter-decade-faltering-attention-spans.html. 
+
+
+**4**
+
+Dagohoy, Jan Llenzl. “Taylor Swift Spotify Data.” Kaggle, November 6, 2021. https://www.kaggle.com/thespacefreak/taylor-swift-spotify-data. 
+
+**5**
+
+Belcher, Sara. “Taylor Swift Has Edited Her ‘From the Vault’ Songs before Releasing - Was ‘All Too Well’ Changed Too?” Distractify. Distractify, November 25, 2021. https://www.distractify.com/p/does-taylor-swift-change-her-from-the-vault-songs. 
+
+
+**6**
+
+Steiert, Bella. “Taylor Swift Goes into Indie Territory with ‘Folklore’ and ‘Evermore.’” Hatter Network, March 31, 2021. https://hatternetwork.com/8959/analogue/taylor-swift-goes-into-indie-territory-with-folklore-and-evermore/. 
+
+**7**
+
+Swanson, Dale. “Genre Average Song Lengths.” Genre Average Song Lengths, August 21, 2013. https://daleswanson.blogspot.com/2013/08/genre-average-song-lengths.html. 
+
+
+**Appendix**
+
+A pairwise comparison of years with the highest average song length and the shortest average song length produces 95% confidence interval from  3.4 minutes to 4.6 minutes. Hence we can say with 95% confidence that songs in the year 2010 were somewhere between 0.7 minutes and 1.6 minutes longer on average than songs released in 2019. It is interesting to see that the average song length decreased by around more than a minute and a half from 2010 to 2019.
+```{r, include= FALSE}
+t.test(length_min ~ release_year, data = taylorSwift,
+subset = (release_year == "2010" | release_year == "2019"))
+```
+
+Moreover, below are our simulated datasets which validate our assumption of equal within group variability for the ANOVA F test. Our original dataset of boxplots (*graph#1*) is very similar to this fake lineup containing datasets with equal within group SD which makes our F test assumption valid.
+
+```{r, echo= FALSE}
+source("http://people.carleton.edu/~apoppick/ClassData/equalSD.lineup.R")
+equalSD.lineup(length_min~release_year, data = taylorSwift)
+```
