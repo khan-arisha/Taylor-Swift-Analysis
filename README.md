@@ -1,5 +1,7 @@
 # Taylor Swift Analysis
 
+Open EDA.pdf for a full exploratory data analysis report and data visualization.
+
 ## Abstract ##
 
 In this study, we planned to analyze if the notion of declining attention spans has made its way into the
@@ -32,3 +34,9 @@ can be used to generalize to every Taylor Swift streamer using a platform simila
 Note: we assumed that her re-recorded albums are old albums; that is to say that we considered their
 original release year instead of the year the re-recordings were released. However, the new songs on these
 albums – named “From the Vault” – were categorized as new. Also, there are three songs in the dataset that have 0 popularity. Since there is no popularity information available for them, we excluded them when doing an analysis for our second relationship.
+
+#### Datasets  ####
+
+*Spotify_taylorSwift - spotify_taylorswift 3.csv*
+
+
