@@ -1,6 +1,6 @@
 # Taylor Swift Analysis
 
-Open EDA.pdf for a full exploratory data analysis report and data visualization.
+Open EDA.pdf for a full exploratory data analysis report.
 
 ## Abstract ##
 
